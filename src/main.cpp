@@ -14,7 +14,16 @@ int main(int, char **) {
 
   std::cout << std::endl;
   std::cout << heap.toString(alg::TreeStyle::H_BOXED);
-  // std::cout << heap.toString(alg::TreeStyle::V_BOXED);
+  std::cout << std::endl;
+
+  heap.remove();
+  std::cout << std::endl;
+  std::cout << heap.toString(alg::TreeStyle::H_BOXED);
+  std::cout << std::endl;
+
+  heap.remove();
+  std::cout << std::endl;
+  std::cout << heap.toString(alg::TreeStyle::H_BOXED);
   std::cout << std::endl;
 
 // #if _WIN32
