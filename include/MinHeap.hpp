@@ -1,27 +1,8 @@
 #pragma once
 
-#include <algorithm> // copy, make_heap
-#include <array>
-#include <cmath>
-#include <cstddef> // size_t
-#include <deque>
-#include <functional>
-#include <iomanip>
-#include <iterator> // back_inserter
-#include <queue>
-#include <sstream>
-#include <string>
-#include <utility> // swap
-#include <vector>
+#include "HeapUtils.hpp"
 
 namespace alg {
-
-enum class TreeStyle {
-  V_SPACED,
-  V_BOXED,
-  H_TABBED,
-  H_BOXED,
-};
 
 template <class T> class MinHeap {
 public:
