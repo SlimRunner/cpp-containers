@@ -4,7 +4,6 @@
 
 namespace alg {
 
-template <class T>
-using MaxHeap = OrderedHeap<T, std::less<T>>;
+template <class T> using MaxHeap = OrderedHeap<T, std::less<T>>;
 
 } // namespace alg

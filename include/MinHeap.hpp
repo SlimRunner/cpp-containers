@@ -4,7 +4,6 @@
 
 namespace alg {
 
-template <class T>
-using MinHeap = OrderedHeap<T, std::greater<T>>;
+template <class T> using MinHeap = OrderedHeap<T, std::greater<T>>;
 
 } // namespace alg

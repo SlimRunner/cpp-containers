@@ -2,9 +2,9 @@
 
 #include <algorithm> // copy, make_heap
 #include <array>
-#include <cmath> // log10, log2, ceil
-#include <cstddef> // size_t
-#include <deque> // as container
+#include <cmath>      // log10, log2, ceil
+#include <cstddef>    // size_t
+#include <deque>      // as container
 #include <functional> // lambda with recursion
 #include <iomanip>
 #include <iterator> // back_inserter

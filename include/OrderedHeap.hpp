@@ -27,7 +27,8 @@ private:
   bool hasRight(size_t index);
 };
 
-template <class T, class Compare> inline OrderedHeap<T, Compare>::OrderedHeap() : mComp{Compare{}}, mHeap{} {}
+template <class T, class Compare>
+inline OrderedHeap<T, Compare>::OrderedHeap() : mComp{Compare{}}, mHeap{} {}
 
 template <class T, class Compare>
 template <class It>
@@ -36,7 +37,8 @@ inline OrderedHeap<T, Compare>::OrderedHeap(It begin, It end) : OrderedHeap{} {
   balanceHeap();
 }
 
-template <class T, class Compare> inline void OrderedHeap<T, Compare>::insert(T value) {
+template <class T, class Compare>
+inline void OrderedHeap<T, Compare>::insert(T value) {
   mHeap.push_back(value);
   balanceNode(mHeap.size() - 1);
 }
@@ -50,7 +52,8 @@ template <class T, class Compare> inline T OrderedHeap<T, Compare>::remove() {
 }
 
 template <class T, class Compare>
-inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style, bool rounded) const {
+inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style,
+                                                     bool rounded) const {
   const size_t HEIGHT =
       static_cast<size_t>(std::ceil(std::log2(mHeap.size() + 1)));
   const size_t HEAP_SIZE = mHeap.size();
@@ -131,11 +134,13 @@ inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style, bool round
   return oss.str();
 }
 
-template <class T, class Compare> void inline OrderedHeap<T, Compare>::balanceHeap() {
+template <class T, class Compare>
+void inline OrderedHeap<T, Compare>::balanceHeap() {
   std::make_heap(mHeap.begin(), mHeap.end(), mComp);
 }
 
-template <class T, class Compare> inline void OrderedHeap<T, Compare>::balanceNode(size_t index) {
+template <class T, class Compare>
+inline void OrderedHeap<T, Compare>::balanceNode(size_t index) {
   size_t iNode = index + 1;
   while (true) {
     size_t iSwap = iNode / 2;
@@ -149,7 +154,8 @@ template <class T, class Compare> inline void OrderedHeap<T, Compare>::balanceNo
   };
 }
 
-template <class T, class Compare> inline void OrderedHeap<T, Compare>::balanceRoot() {
+template <class T, class Compare>
+inline void OrderedHeap<T, Compare>::balanceRoot() {
   const size_t HEAP_SIZE = mHeap.size();
   size_t iNode = 1; // Start with the root node
 
@@ -162,7 +168,8 @@ template <class T, class Compare> inline void OrderedHeap<T, Compare>::balanceRo
       iSwap = iLeft;
     }
 
-    if (iRight <= HEAP_SIZE && mComp(mHeap.at(iSwap - 1), mHeap.at(iRight - 1))) {
+    if (iRight <= HEAP_SIZE &&
+        mComp(mHeap.at(iSwap - 1), mHeap.at(iRight - 1))) {
       iSwap = iRight;
     }
 
@@ -175,11 +182,13 @@ template <class T, class Compare> inline void OrderedHeap<T, Compare>::balanceRo
   }
 }
 
-template <class T, class Compare> inline bool OrderedHeap<T, Compare>::hasLeft(size_t index) {
+template <class T, class Compare>
+inline bool OrderedHeap<T, Compare>::hasLeft(size_t index) {
   return (index + 1) * 2 >= mHeap.size();
 }
 
-template <class T, class Compare> inline bool OrderedHeap<T, Compare>::hasRight(size_t index) {
+template <class T, class Compare>
+inline bool OrderedHeap<T, Compare>::hasRight(size_t index) {
   return (index + 1) * 2 + 1 >= mHeap.size();
 }
 
