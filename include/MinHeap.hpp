@@ -24,13 +24,6 @@ enum class TreeStyle {
 };
 
 template <class T> class MinHeap {
-private:
-  std::vector<T> mHeap;
-  void balanceHeap();
-  void heapifyNode(size_t index);
-  bool hasLeft(size_t index);
-  bool hasRight(size_t index);
-
 public:
   MinHeap();
   template <class It> MinHeap(It begin, It end);
@@ -41,35 +34,23 @@ public:
   std::vector<T>::iterator end() { return mHeap.end(); }
 
   std::string toString(TreeStyle style, bool rounded = false) const;
+
+private:
+  std::vector<T> mHeap;
+  void balanceHeap();
+  void heapifyNode(size_t index);
+  bool hasLeft(size_t index);
+  bool hasRight(size_t index);
 };
 
-template <class T> void inline MinHeap<T>::balanceHeap() {
-  std::make_heap(mHeap.begin(), mHeap.end(), std::greater<T>{});
-}
-
-template <class T> inline void MinHeap<T>::heapifyNode(size_t index) {
-  bool notSorted = true;
-  // indices here are treated as 1-based
-  size_t iNode = index + 1, iParent = index + 1;
-  do {
-    iNode = iParent;
-    iParent = iNode / 2;
-    notSorted = iParent != 0 && mHeap.at(iNode - 1) < mHeap.at(iParent - 1);
-    if (notSorted) {
-      std::swap(mHeap.at(iNode - 1), mHeap.at(iParent - 1));
-    }
-  } while (notSorted);
-}
-
-template <class T> inline bool MinHeap<T>::hasLeft(size_t index) {
-  return (index + 1) * 2 >= mHeap.size();
-}
-
-template <class T> inline bool MinHeap<T>::hasRight(size_t index) {
-  return (index + 1) * 2 + 1 >= mHeap.size();
-}
-
 template <class T> inline MinHeap<T>::MinHeap() : mHeap{} {}
+
+template <class T>
+template <class It>
+inline MinHeap<T>::MinHeap(It begin, It end) : MinHeap{} {
+  std::copy(begin, end, std::back_inserter(mHeap));
+  balanceHeap();
+}
 
 template <class T> inline void MinHeap<T>::insert(T value) {
   mHeap.push_back(value);
@@ -158,11 +139,30 @@ inline std::string MinHeap<T>::toString(TreeStyle style, bool rounded) const {
   return oss.str();
 }
 
-template <class T>
-template <class It>
-inline MinHeap<T>::MinHeap(It begin, It end) : MinHeap{} {
-  std::copy(begin, end, std::back_inserter(mHeap));
-  balanceHeap();
+template <class T> void inline MinHeap<T>::balanceHeap() {
+  std::make_heap(mHeap.begin(), mHeap.end(), std::greater<T>{});
+}
+
+template <class T> inline void MinHeap<T>::heapifyNode(size_t index) {
+  bool notSorted = true;
+  // indices here are treated as 1-based
+  size_t iNode = index + 1, iParent = index + 1;
+  do {
+    iNode = iParent;
+    iParent = iNode / 2;
+    notSorted = iParent != 0 && mHeap.at(iNode - 1) < mHeap.at(iParent - 1);
+    if (notSorted) {
+      std::swap(mHeap.at(iNode - 1), mHeap.at(iParent - 1));
+    }
+  } while (notSorted);
+}
+
+template <class T> inline bool MinHeap<T>::hasLeft(size_t index) {
+  return (index + 1) * 2 >= mHeap.size();
+}
+
+template <class T> inline bool MinHeap<T>::hasRight(size_t index) {
+  return (index + 1) * 2 + 1 >= mHeap.size();
 }
 
 } // namespace alg
