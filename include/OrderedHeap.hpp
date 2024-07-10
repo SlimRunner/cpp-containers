@@ -52,8 +52,9 @@ template <class T, class Compare> inline T OrderedHeap<T, Compare>::remove() {
 }
 
 template <class T, class Compare>
-inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style,
-                                                     bool rounded) const {
+template <class T, class Compare>
+inline std::vector<std::string>
+OrderedHeap<T, Compare>::toLines(TreeStyle style, bool rounded) const {
   const size_t HEIGHT =
       static_cast<size_t>(std::ceil(std::log2(mHeap.size() + 1)));
   const size_t HEAP_SIZE = mHeap.size();
@@ -78,6 +79,7 @@ inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style,
 
   size_t spacing = 0;
   std::ostringstream oss;
+  std::vector<std::string> output;
 
   if (rounded) {
     lPipes.at(0) = "╭";
@@ -86,13 +88,10 @@ inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style,
   }
 
   for (auto const &item : mHeap) {
-    if (item >= 0) {
-      spacing = static_cast<size_t>(
-          std::max<double>(spacing, std::ceil(std::log10(item + 1))));
-    } else {
-      spacing = static_cast<size_t>(
-          std::max<double>(spacing, 1 + std::ceil(std::log10(-item + 1))));
-    }
+    auto num = (item < 0 ? -item : item);
+    size_t offset = static_cast<size_t>(item < 0);
+    spacing = static_cast<size_t>(
+        std::max<double>(spacing, offset + std::ceil(std::log10(num + 1))));
   }
 
   switch (style) {
@@ -107,7 +106,9 @@ inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style,
       lvl = static_cast<size_t>(std::ceil(std::log2(i + 2))) - 1;
       oss << std::setw(0) << std::string(spacing * lvl, ' ');
       oss << std::setfill('0') << std::setw(spacing) << std::internal;
-      oss << mHeap.at(i) << '\n';
+      oss << mHeap.at(i);
+      output.push_back(oss.str());
+      oss.str("");
     }
 
     break;
@@ -123,7 +124,8 @@ inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style,
         oss << std::string(spacing * ((1 << (HEIGHT - lvl)) - 1U), ' ');
       }
       N0 += N1 - N0;
-      oss << '\n';
+      output.push_back(oss.str());
+      oss.str("");
     }
     break;
 
@@ -131,7 +133,7 @@ inline std::string OrderedHeap<T, Compare>::toString(TreeStyle style,
     break;
   }
 
-  return oss.str();
+  return output;
 }
 
 template <class T, class Compare>
