@@ -28,6 +28,8 @@ private:
   std::vector<T> mHeap;
   void balanceHeap();
   void heapifyNode(size_t index);
+  bool hasLeft(size_t index);
+  bool hasRight(size_t index);
 
 public:
   MinHeap();
@@ -59,6 +61,14 @@ template <class T> inline void MinHeap<T>::heapifyNode(size_t index) {
   } while (notSorted);
 }
 
+template <class T> inline bool MinHeap<T>::hasLeft(size_t index) {
+  return (index + 1) * 2 >= mHeap.size();
+}
+
+template <class T> inline bool MinHeap<T>::hasRight(size_t index) {
+  return (index + 1) * 2 + 1 >= mHeap.size();
+}
+
 template <class T> inline MinHeap<T>::MinHeap() : mHeap{} {}
 
 template <class T> inline void MinHeap<T>::insert(T value) {
@@ -73,7 +83,6 @@ inline std::string MinHeap<T>::toString(TreeStyle style, bool rounded) const {
   const size_t HEAP_SIZE = mHeap.size();
   std::array<std::string, 3> lPipes = {"┌", "┐", "└"};
   std::array<std::string, 2> endCaps = {"╴", "╶"};
-  std::vector<bool> visited(HEAP_SIZE, false);
   std::queue<size_t> queue;
 
   std::function<void(size_t)> enqeue;
@@ -81,12 +90,12 @@ inline std::string MinHeap<T>::toString(TreeStyle style, bool rounded) const {
   enqeue = [&queue, &enqeue, HEAP_SIZE](size_t i) {
     i <<= 1;
     if (i <= HEAP_SIZE) {
-      queue.push(i);
+      queue.push(i - 1);
       enqeue(i);
     }
     ++i;
     if (i <= HEAP_SIZE) {
-      queue.push(i);
+      queue.push(i - 1);
       enqeue(i);
     }
   };
@@ -113,16 +122,16 @@ inline std::string MinHeap<T>::toString(TreeStyle style, bool rounded) const {
   switch (style) {
   case TreeStyle::H_BOXED:
   case TreeStyle::H_TABBED:
-    queue.push(1);
-    visited.at(0) = true;
+    queue.push(0);
     enqeue(1);
+
     for (size_t i, lvl = 0; !queue.empty();) {
       i = queue.front();
       queue.pop();
-      lvl = static_cast<size_t>(std::ceil(std::log2(i + 1))) - 1;
+      lvl = static_cast<size_t>(std::ceil(std::log2(i + 2))) - 1;
       oss << std::setw(0) << std::string(spacing * lvl, ' ');
       oss << std::setfill('0') << std::setw(spacing) << std::internal;
-      oss << mHeap.at(i - 1) << '\n';
+      oss << mHeap.at(i) << '\n';
     }
 
     break;
