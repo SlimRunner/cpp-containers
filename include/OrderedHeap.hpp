@@ -58,6 +58,9 @@ OrderedHeap<T, Compare>::toLines(TreeStyle style, bool rounded) const {
   const size_t HEIGHT =
       static_cast<size_t>(std::ceil(std::log2(mHeap.size() + 1)));
   const size_t HEAP_SIZE = mHeap.size();
+  if (!HEAP_SIZE) {
+    return std::vector<std::string>{};
+  }
   std::array<std::string, 3> lPipes = {"┌", "┐", "└"};
   std::array<std::string, 2> endCaps = {"╴", "╶"};
   std::queue<size_t> queue;
