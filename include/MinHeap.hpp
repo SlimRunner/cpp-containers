@@ -10,6 +10,7 @@ public:
   template <class It> MinHeap(It begin, It end);
 
   void insert(T value);
+  T remove();
 
   std::vector<T>::iterator begin() { return mHeap.begin(); }
   std::vector<T>::iterator end() { return mHeap.end(); }
@@ -19,7 +20,8 @@ public:
 private:
   std::vector<T> mHeap;
   void balanceHeap();
-  void heapifyNode(size_t index);
+  void balanceNode(size_t index);
+  void balanceRoot();
   bool hasLeft(size_t index);
   bool hasRight(size_t index);
 };
@@ -35,7 +37,15 @@ inline MinHeap<T>::MinHeap(It begin, It end) : MinHeap{} {
 
 template <class T> inline void MinHeap<T>::insert(T value) {
   mHeap.push_back(value);
-  heapifyNode(mHeap.size() - 1);
+  balanceNode(mHeap.size() - 1);
+}
+
+template <class T> inline T MinHeap<T>::remove() {
+  const auto value = mHeap.front();
+  mHeap.front() = mHeap.back();
+  mHeap.pop_back();
+  balanceHeap();
+  return value;
 }
 
 template <class T>
@@ -124,7 +134,7 @@ template <class T> void inline MinHeap<T>::balanceHeap() {
   std::make_heap(mHeap.begin(), mHeap.end(), std::greater<T>{});
 }
 
-template <class T> inline void MinHeap<T>::heapifyNode(size_t index) {
+template <class T> inline void MinHeap<T>::balanceNode(size_t index) {
   bool notSorted = true;
   // indices here are treated as 1-based
   size_t iNode = index + 1, iParent = index + 1;
@@ -136,6 +146,35 @@ template <class T> inline void MinHeap<T>::heapifyNode(size_t index) {
       std::swap(mHeap.at(iNode - 1), mHeap.at(iParent - 1));
     }
   } while (notSorted);
+}
+
+template <class T> inline void MinHeap<T>::balanceRoot() {
+  const size_t HEAP_SIZE = mHeap.size();
+  bool leftNotSorted = true, rightNotSorted = true;
+  // indices here are treated as 1-based
+  size_t iNode = 1, iLeft = 1, iRight = 1;
+
+  do {
+    iLeft = iNode * 2;
+    iRight = iLeft + 1;
+    leftNotSorted = iLeft <= HEAP_SIZE && mHeap.at(iNode - 1) > mHeap.at(iLeft - 1);
+    rightNotSorted = iRight <= HEAP_SIZE && mHeap.at(iNode - 1) > mHeap.at(iRight - 1);
+    if (leftNotSorted && rightNotSorted) {
+      if (mHeap.at(iLeft - 1) <= mHeap.at(iRight - 1)) {
+        std::swap(mHeap.at(iNode - 1), mHeap.at(iLeft - 1));
+        iNode = iLeft;
+      } else {
+        std::swap(mHeap.at(iNode - 1), mHeap.at(iRight - 1));
+        iNode = iRight;
+      }
+    } else if (leftNotSorted) {
+      std::swap(mHeap.at(iNode - 1), mHeap.at(iLeft - 1));
+      iNode = iLeft;
+    } else if (rightNotSorted) {
+      std::swap(mHeap.at(iNode - 1), mHeap.at(iRight - 1));
+      iNode = iRight;
+    }
+  } while (leftNotSorted || rightNotSorted);
 }
 
 template <class T> inline bool MinHeap<T>::hasLeft(size_t index) {
