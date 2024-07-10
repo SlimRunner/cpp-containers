@@ -12,10 +12,14 @@ public:
   void insert(T value);
   T remove();
 
+  T top() const;
+  size_t size() const;
+
   std::vector<T>::iterator begin() { return mHeap.begin(); }
   std::vector<T>::iterator end() { return mHeap.end(); }
 
-  std::string toString(TreeStyle style, bool rounded = false) const;
+  std::vector<std::string> toLines(TreeStyle style,
+                                    bool rounded = false) const;
 
 private:
   Compare mComp;
@@ -52,6 +56,15 @@ template <class T, class Compare> inline T OrderedHeap<T, Compare>::remove() {
 }
 
 template <class T, class Compare>
+inline T OrderedHeap<T, Compare>::top() const {
+  return mHeap.front();
+}
+
+template <class T, class Compare>
+inline size_t OrderedHeap<T, Compare>::size() const {
+  return mHeap.size();
+}
+
 template <class T, class Compare>
 inline std::vector<std::string>
 OrderedHeap<T, Compare>::toLines(TreeStyle style, bool rounded) const {
