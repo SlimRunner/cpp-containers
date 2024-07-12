@@ -8,6 +8,7 @@
 #include <functional> // lambda with recursion
 #include <iomanip>
 #include <iterator> // back_inserter
+#include <numeric>
 #include <queue>
 #include <sstream>
 #include <string>

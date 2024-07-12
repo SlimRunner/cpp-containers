@@ -19,6 +19,9 @@ public:
   std::vector<T>::iterator end() { return mHeap.end(); }
 
   std::vector<std::string> toLines(bool rounded = false) const;
+  std::vector<size_t> getLevelOrderIndices() const;
+  std::vector<size_t> getPreOrderIndices() const;
+  std::vector<T> toVector() const;
 
 private:
   TreePrintStyle mStyle;
@@ -32,8 +35,6 @@ private:
 
   void getPrintDiagram(std::vector<size_t> &indices,
                        std::vector<std::vector<bool>> &map) const;
-  std::vector<size_t> getLevelOrder() const;
-  std::vector<size_t> getPreOrder() const;
   void preOrderHelper(size_t i, std::vector<size_t> &out) const;
 };
 
@@ -152,6 +153,28 @@ OrderedHeap<T, Compare>::toLines(bool rounded) const {
 }
 
 template <class T, class Compare>
+inline std::vector<size_t>
+OrderedHeap<T, Compare>::getLevelOrderIndices() const {
+  std::vector<size_t> out(mHeap.size());
+  std::iota(out.begin(), out.end(), 0);
+  return out;
+}
+
+template <class T, class Compare>
+inline std::vector<size_t> OrderedHeap<T, Compare>::getPreOrderIndices() const {
+  std::vector<size_t> out{0};
+  preOrderHelper(1, out);
+  return out;
+}
+
+template <class T, class Compare>
+inline std::vector<T> OrderedHeap<T, Compare>::toVector() const {
+  std::vector<T> out;
+  std::copy(mHeap.cbegin(), mHeap.cend(), std::back_inserter(out));
+  return out;
+}
+
+template <class T, class Compare>
 void inline OrderedHeap<T, Compare>::balanceHeap() {
   std::make_heap(mHeap.begin(), mHeap.end(), mComp);
 }
@@ -228,7 +251,7 @@ inline void OrderedHeap<T, Compare>::getPrintDiagram(
 
   switch (mStyle.orientation) {
   case PrintOrientation::HORIZONTAL:
-    indices = getPreOrder();
+    indices = getPreOrderIndices();
     for (const auto &i : indices) {
       auto lvl = static_cast<size_t>(std::ceil(std::log2(i + 2))) - 1;
       map.push_back({});
@@ -241,7 +264,7 @@ inline void OrderedHeap<T, Compare>::getPrintDiagram(
     delta = 1 << HEIGHT;
     termOffset = (delta >> 1) - 1;
     levelRows = delta - 1; // trim last gap
-    indices = getLevelOrder();
+    indices = getLevelOrderIndices();
 
     count = 0;
     for (size_t lvl = 0; lvl < HEIGHT; ++lvl) {
@@ -259,22 +282,6 @@ inline void OrderedHeap<T, Compare>::getPrintDiagram(
   default:
     break;
   }
-}
-
-template <class T, class Compare>
-inline std::vector<size_t> OrderedHeap<T, Compare>::getLevelOrder() const {
-  std::vector<size_t> out;
-  for (size_t i = 0; i < mHeap.size(); ++i) {
-    out.push_back(i);
-  }
-  return out;
-}
-
-template <class T, class Compare>
-inline std::vector<size_t> OrderedHeap<T, Compare>::getPreOrder() const {
-  std::vector<size_t> out{0};
-  preOrderHelper(1, out);
-  return out;
 }
 
 template <class T, class Compare>
