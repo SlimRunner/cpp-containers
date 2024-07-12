@@ -12,8 +12,8 @@ public:
   void insert(T value);
   T remove();
 
-  T top() const;
-  size_t size() const;
+  T top() const { return mHeap.front(); }
+  size_t size() const { return mHeap.size(); }
 
   std::vector<T>::iterator begin() { return mHeap.begin(); }
   std::vector<T>::iterator end() { return mHeap.end(); }
@@ -22,8 +22,9 @@ public:
                                     bool rounded = false) const;
 
 private:
-  Compare mComp;
+  TreePrintStyle mStyle;
   std::vector<T> mHeap;
+  Compare mComp;
   void balanceHeap();
   void balanceNode(size_t index);
   void balanceRoot();
@@ -32,7 +33,8 @@ private:
 };
 
 template <class T, class Compare>
-inline OrderedHeap<T, Compare>::OrderedHeap() : mComp{Compare{}}, mHeap{} {}
+inline OrderedHeap<T, Compare>::OrderedHeap()
+    : mStyle{}, mHeap{}, mComp{Compare{}} {}
 
 template <class T, class Compare>
 template <class It>
@@ -53,16 +55,6 @@ template <class T, class Compare> inline T OrderedHeap<T, Compare>::remove() {
   mHeap.pop_back();
   balanceHeap();
   return value;
-}
-
-template <class T, class Compare>
-inline T OrderedHeap<T, Compare>::top() const {
-  return mHeap.front();
-}
-
-template <class T, class Compare>
-inline size_t OrderedHeap<T, Compare>::size() const {
-  return mHeap.size();
 }
 
 template <class T, class Compare>
