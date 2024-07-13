@@ -7,7 +7,14 @@ namespace alg {
 template <class T, class Compare = std::less<T>> class OrderedHeap {
 public:
   OrderedHeap();
+  OrderedHeap(TreePrintStyle style);
   template <class It> OrderedHeap(It begin, It end);
+  template <class It> OrderedHeap(It begin, It end, TreePrintStyle style);
+
+  struct IndexEntry {
+    size_t index;
+    bool enable;
+  };
 
   void insert(T value);
   T remove();
@@ -21,20 +28,20 @@ public:
   std::vector<std::string> toLines(bool rounded = false) const;
   std::vector<size_t> getLevelOrderIndices() const;
   std::vector<size_t> getPreOrderIndices() const;
+  void getPrintDiagram(std::vector<std::vector<IndexEntry>> &map) const;
   std::vector<T> toVector() const;
 
 private:
   TreePrintStyle mStyle;
   std::vector<T> mHeap;
   Compare mComp;
+
   void balanceHeap();
   void balanceNode(size_t index);
   void balanceRoot();
   bool hasLeft(size_t index);
   bool hasRight(size_t index);
 
-  void getPrintDiagram(std::vector<size_t> &indices,
-                       std::vector<std::vector<bool>> &map) const;
   void preOrderHelper(size_t i, std::vector<size_t> &out) const;
 };
 
@@ -43,10 +50,24 @@ inline OrderedHeap<T, Compare>::OrderedHeap()
     : mStyle{}, mHeap{}, mComp{Compare{}} {}
 
 template <class T, class Compare>
+inline OrderedHeap<T, Compare>::OrderedHeap(TreePrintStyle style)
+    : OrderedHeap{} {
+  mStyle = style;
+}
+
+template <class T, class Compare>
 template <class It>
 inline OrderedHeap<T, Compare>::OrderedHeap(It begin, It end) : OrderedHeap{} {
   std::copy(begin, end, std::back_inserter(mHeap));
   balanceHeap();
+}
+
+template <class T, class Compare>
+template <class It>
+inline OrderedHeap<T, Compare>::OrderedHeap(It begin, It end,
+                                            TreePrintStyle style)
+    : OrderedHeap{begin, end} {
+  mStyle = style;
 }
 
 template <class T, class Compare>
@@ -234,11 +255,11 @@ inline bool OrderedHeap<T, Compare>::hasRight(size_t index) {
 
 template <class T, class Compare>
 inline void OrderedHeap<T, Compare>::getPrintDiagram(
-    std::vector<size_t> &indices, std::vector<std::vector<bool>> &map) const {
+    std::vector<std::vector<IndexEntry>> &map) const {
   const size_t HEIGHT =
       static_cast<size_t>(std::ceil(std::log2(mHeap.size() + 1)));
   const size_t HEAP_SIZE = mHeap.size();
-  std::vector<std::vector<bool>> outDiag;
+  std::vector<size_t> indices;
   std::queue<size_t> queue;
   std::function<void(size_t)> enqeue;
 
@@ -246,8 +267,9 @@ inline void OrderedHeap<T, Compare>::getPrintDiagram(
     return;
   }
 
-  size_t levelRows, count;
+  size_t levelRows;
   size_t termOffset, delta; // terms of linear sequence
+  std::vector<size_t>::const_iterator idxIt;
 
   switch (mStyle.orientation) {
   case PrintOrientation::HORIZONTAL:
@@ -256,7 +278,11 @@ inline void OrderedHeap<T, Compare>::getPrintDiagram(
       auto lvl = static_cast<size_t>(std::ceil(std::log2(i + 2))) - 1;
       map.push_back({});
       for (size_t n = 0; n < HEIGHT; ++n) {
-        map.back().push_back(n == lvl);
+        if (n == lvl) {
+          map.back().push_back({i, true});
+        } else {
+          map.back().push_back({0U, false});
+        }
       }
     }
     break;
@@ -265,14 +291,18 @@ inline void OrderedHeap<T, Compare>::getPrintDiagram(
     termOffset = (delta >> 1) - 1;
     levelRows = delta - 1; // trim last gap
     indices = getLevelOrderIndices();
+    idxIt = indices.cbegin();
 
-    count = 0;
     for (size_t lvl = 0; lvl < HEIGHT; ++lvl) {
       map.push_back({});
       for (size_t n = 0, ni; n < levelRows; ++n) {
         ni = ((n - termOffset) / delta) * delta + termOffset;
-        map.back().push_back(n == ni && count < HEAP_SIZE);
-        count += map.back().back();
+        if (n == ni && idxIt != indices.end()) {
+          map.back().push_back({*idxIt, true});
+          idxIt++;
+        } else {
+          map.back().push_back({0U, false});
+        }
       }
       delta >>= 1;
       termOffset = (delta >> 1) - 1;
@@ -281,6 +311,15 @@ inline void OrderedHeap<T, Compare>::getPrintDiagram(
 
   default:
     break;
+  }
+
+  if (mStyle.order == PrintOrder::BOTTOM_UP) {
+    std::reverse(map.begin(), map.end());
+  }
+  if (mStyle.levelOrder == LevelOrder::RIGHT_TO_LEFT) {
+    for (auto && line: map) {
+      std::reverse(line.begin(), line.end());
+    }
   }
 }
 
