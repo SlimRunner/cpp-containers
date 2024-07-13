@@ -162,8 +162,8 @@ OrderedHeap<T, Compare>::getLevelOrderIndices() const {
 
 template <class T, class Compare>
 inline std::vector<size_t> OrderedHeap<T, Compare>::getPreOrderIndices() const {
-  std::vector<size_t> out{0};
-  preOrderHelper(1, out);
+  std::vector<size_t> out;
+  preOrderHelper(0, out);
   return out;
 }
 
@@ -288,16 +288,13 @@ template <class T, class Compare>
 inline void
 OrderedHeap<T, Compare>::preOrderHelper(size_t i,
                                         std::vector<size_t> &out) const {
+  if (i >= mHeap.size()) {
+    return;
+  }
+  out.push_back(i);
   i <<= 1;
-  if (i <= mHeap.size()) {
-    out.push_back(i - 1);
-    preOrderHelper(i, out);
-  }
-  ++i;
-  if (i <= mHeap.size()) {
-    out.push_back(i - 1);
-    preOrderHelper(i, out);
-  }
+  preOrderHelper(++i, out);
+  preOrderHelper(++i, out);
 }
 
 } // namespace alg
